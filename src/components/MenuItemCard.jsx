@@ -10,6 +10,11 @@ export default function MenuItemCard({ item }) {
         <span className="menu-item-price">${item.price.toFixed(2)}</span>
       </div>
       <p className="menu-item-desc">{item.description}</p>
+      {item.ingredients?.length > 0 && (
+        <p className="muted" style={{ margin: 0 }}>
+          Ingredients: {item.ingredients.join(", ")}
+        </p>
+      )}
       <div className="tag-row">
         {item.dietaryInfo?.map((d) => (
           <span key={d} className="tag">
