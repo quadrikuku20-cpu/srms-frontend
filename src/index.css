@@ -193,7 +193,7 @@ input, select, textarea {
   padding-bottom: 20px;
   border-bottom: 1px solid var(--line);
 }
-.menu-toolbar input[type="search"], .menu-toolbar select {
+.menu-toolbar input[type="search"], .menu-toolbar input[type="number"], .menu-toolbar select {
   padding: 9px 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);

@@ -16,6 +16,7 @@ export default function Menu() {
   const [category, setCategory] = useState("");
   const [dietary, setDietary] = useState("");
   const [search, setSearch] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -23,13 +24,14 @@ export default function Menu() {
     if (category) params.category = category;
     if (dietary) params.dietary = dietary;
     if (search) params.search = search;
+    if (maxPrice !== "") params.maxPrice = maxPrice;
 
     api
       .get("/menu", { params })
       .then(({ data }) => setItems(data))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, [category, dietary, search]);
+  }, [category, dietary, search, maxPrice]);
 
   const grouped = useMemo(() => {
     const groups = {};
@@ -57,7 +59,7 @@ export default function Menu() {
         </div>
         <input
           type="search"
-          placeholder="Search dishes…"
+          placeholder="Search dishes..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -69,9 +71,17 @@ export default function Menu() {
           <option value="dairy-free">Dairy-free</option>
           <option value="nut-free">Nut-free</option>
         </select>
+        <input
+          type="number"
+          min="0"
+          step="1"
+          placeholder="Max price ($)"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+        />
       </div>
 
-      {loading && <p>Loading menu…</p>}
+      {loading && <p>Loading menu...</p>}
       {!loading && items.length === 0 && (
         <div className="empty-state">No dishes match those filters.</div>
       )}
