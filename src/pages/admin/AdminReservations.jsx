@@ -32,6 +32,7 @@ export default function AdminReservations() {
             <th>Date / Time</th>
             <th>Table</th>
             <th>Party</th>
+            <th>Type</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -44,6 +45,7 @@ export default function AdminReservations() {
               </td>
               <td>{r.tableNumber}</td>
               <td>{r.partySize}</td>
+              <td style={{ textTransform: "capitalize" }}>{r.reservationType || "dining"}</td>
               <td>
                 <select value={r.status} onChange={(e) => updateReservationStatus(r._id, e.target.value)}>
                   <option value="pending">pending</option>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/api.js";
 
-const emptyForm = { date: "", time: "", partySize: 2, specialRequests: "" };
+const emptyForm = { date: "", time: "", partySize: 2, reservationType: "dining", specialRequests: "" };
 
 export default function Reservations() {
   const [reservations, setReservations] = useState([]);
@@ -69,6 +69,20 @@ export default function Reservations() {
             </div>
           </div>
           <div className="form-field">
+            <label htmlFor="rtype">Reservation type</label>
+            <select
+              id="rtype"
+              value={form.reservationType}
+              onChange={(e) => setForm({ ...form, reservationType: e.target.value })}
+            >
+              <option value="dining">Dining</option>
+              <option value="birthday">Birthday</option>
+              <option value="anniversary">Anniversary</option>
+              <option value="business">Business</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div className="form-field">
             <label htmlFor="party">Party size</label>
             <input
               id="party"
@@ -106,7 +120,7 @@ export default function Reservations() {
                 <span className={`status-badge status-${r.status}`}>{r.status}</span>
               </div>
               <p className="muted">
-                Table {r.tableNumber} · Party of {r.partySize}
+                Table {r.tableNumber} · Party of {r.partySize} &middot;{" "}<span style={{ textTransform: "capitalize" }}>{r.reservationType || "dining"}</span>
               </p>
               {r.status !== "cancelled" && (
                 <button className="btn-ghost" onClick={() => handleCancel(r._id)}>
