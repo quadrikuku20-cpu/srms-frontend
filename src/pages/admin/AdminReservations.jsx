@@ -69,6 +69,7 @@ export default function AdminReservations() {
             <th>Type</th>
             <th>Date / Time</th>
             <th>Guests</th>
+            <th>Menu</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -81,6 +82,7 @@ export default function AdminReservations() {
                 {ev.date} {ev.time}
               </td>
               <td>{ev.guestCount}</td>
+              <td>{ev.menuSelection?.map((m) => m.name).join(", ") || "-"}</td>
               <td>
                 <select value={ev.status} onChange={(e) => updateEventStatus(ev._id, e.target.value)}>
                   <option value="pending">pending</option>

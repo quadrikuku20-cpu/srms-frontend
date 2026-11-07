@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import api from "../api/api.js";
 
-const emptyForm = { eventType: "birthday", date: "", time: "", guestCount: 8, additionalRequirements: "" };
+const emptyForm = { eventType: "birthday", date: "", time: "", guestCount: 8, menuSelection: [], additionalRequirements: "" };
 
 export default function Events() {
   const [events, setEvents] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -15,6 +16,22 @@ export default function Events() {
   }
 
   useEffect(loadEvents, []);
+
+  useEffect(() => {
+    api
+      .get("/menu")
+      .then(({ data }) => setMenuItems(data))
+      .catch(() => setMenuItems([]));
+  }, []);
+
+  function toggleDish(id) {
+    setForm((prev) => ({
+      ...prev,
+      menuSelection: prev.menuSelection.includes(id)
+        ? prev.menuSelection.filter((d) => d !== id)
+        : [...prev.menuSelection, id],
+    }));
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -94,6 +111,23 @@ export default function Events() {
             />
           </div>
           <div className="form-field">
+            <label>Menu selection (optional)</label>
+            <div style={{ maxHeight: 180, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8, padding: 10 }}>
+              {menuItems.length === 0 && <span className="muted">Menu unavailable right now.</span>}
+              {menuItems.map((m) => (
+                <label key={m._id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <input
+                    type="checkbox"
+                    style={{ width: "auto" }}
+                    checked={form.menuSelection.includes(m._id)}
+                    onChange={() => toggleDish(m._id)}
+                  />
+                  {m.name} <span className="muted">(${m.price.toFixed(2)})</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="form-field">
             <label htmlFor="reqs">Additional requirements</label>
             <textarea
               id="reqs"
@@ -118,6 +152,12 @@ export default function Events() {
               </div>
               <p className="muted">
                 {ev.date} at {ev.time} · {ev.guestCount} guests
+                {ev.menuSelection?.length > 0 && (
+                  <>
+                    <br />
+                    Menu: {ev.menuSelection.map((m) => m.name).join(", ")}
+                  </>
+                )}
               </p>
               {ev.status !== "cancelled" && (
                 <button className="btn-ghost" onClick={() => handleCancel(ev._id)}>
