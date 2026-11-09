@@ -22,7 +22,7 @@ export default function Reservations() {
     setSuccess("");
     setSubmitting(true);
     try {
-      const { data } = await api.post("/reservations", form);
+      const { data } = await api.post("/reservations", form, { skipGlobalError: true });
       setSuccess(`Table ${data.tableNumber} booked for ${data.date} at ${data.time}.`);
       setForm(emptyForm);
       loadReservations();

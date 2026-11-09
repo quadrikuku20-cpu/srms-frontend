@@ -39,7 +39,7 @@ export default function Events() {
     setSuccess("");
     setSubmitting(true);
     try {
-      await api.post("/events", form);
+      await api.post("/events", form, { skipGlobalError: true });
       setSuccess("Event request submitted — an admin will confirm shortly.");
       setForm(emptyForm);
       loadEvents();

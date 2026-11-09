@@ -55,9 +55,9 @@ export default function AdminMenu() {
     };
     try {
       if (editingId) {
-        await api.put(`/menu/${editingId}`, payload);
+        await api.put(`/menu/${editingId}`, payload, { skipGlobalError: true });
       } else {
-        await api.post("/menu", payload);
+        await api.post("/menu", payload, { skipGlobalError: true });
       }
       resetForm();
       loadItems();

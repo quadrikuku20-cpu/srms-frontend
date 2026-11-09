@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar.jsx";
 import Chatbot from "./components/Chatbot.jsx";
+import ErrorBanner from "./components/ErrorBanner.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 import Home from "./pages/Home.jsx";
@@ -17,6 +18,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <NavBar />
+      <ErrorBanner />
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Home />} />
