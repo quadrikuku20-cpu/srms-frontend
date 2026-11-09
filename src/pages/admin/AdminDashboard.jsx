@@ -2,11 +2,13 @@ import { useState } from "react";
 import AdminMenu from "./AdminMenu.jsx";
 import AdminOrders from "./AdminOrders.jsx";
 import AdminReservations from "./AdminReservations.jsx";
+import AdminUsers from "./AdminUsers.jsx";
 
 const TABS = [
   { key: "menu", label: "Menu" },
   { key: "orders", label: "Orders" },
   { key: "reservations", label: "Reservations & Events" },
+  { key: "users", label: "Users" },
 ];
 
 export default function AdminDashboard() {
@@ -25,6 +27,7 @@ export default function AdminDashboard() {
       {tab === "menu" && <AdminMenu />}
       {tab === "orders" && <AdminOrders />}
       {tab === "reservations" && <AdminReservations />}
+      {tab === "users" && <AdminUsers />}
     </div>
   );
 }
