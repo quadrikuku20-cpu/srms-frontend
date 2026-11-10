@@ -1,9 +1,29 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const CartContext = createContext(null);
+const CART_KEY = "srms_cart";
+
+// Read the saved cart; fall back to an empty cart if storage is empty or corrupted.
+function loadSavedCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY));
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]); // [{ menuItem: {..}, quantity }]
+  const [items, setItems] = useState(loadSavedCart); // [{ menuItem: {..}, quantity }]
+
+  // Save the cart whenever it changes so a refresh does not lose it.
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
+    } catch {
+      // storage full or blocked - the cart still works for this session
+    }
+  }, [items]);
 
   function addItem(menuItem) {
     setItems((prev) => {
