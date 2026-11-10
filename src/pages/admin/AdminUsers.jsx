@@ -32,7 +32,7 @@ export default function AdminUsers() {
   return (
     <div>
       <h3>Users</h3>
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && <div className="form-error">{error}</div>}
       <table className="data-table">
         <thead>
           <tr>

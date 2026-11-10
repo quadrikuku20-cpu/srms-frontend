@@ -10,7 +10,13 @@ export default function AdminReservations() {
     api.get("/events").then(({ data }) => setEvents(data));
   }
 
-  useEffect(loadAll, []);
+  useEffect(() => {
+    loadAll();
+    const timer = setInterval(() => {
+      if (!document.hidden) loadAll();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, []);
 
   async function updateReservationStatus(id, status) {
     await api.put(`/reservations/${id}/status`, { status });

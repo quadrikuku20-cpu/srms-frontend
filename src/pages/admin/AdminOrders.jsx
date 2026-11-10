@@ -10,7 +10,13 @@ export default function AdminOrders() {
     api.get("/orders").then(({ data }) => setOrders(data));
   }
 
-  useEffect(loadOrders, []);
+  useEffect(() => {
+    loadOrders();
+    const timer = setInterval(() => {
+      if (!document.hidden) loadOrders();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, []);
 
   async function updateStatus(id, status) {
     await api.put(`/orders/${id}/status`, { status });
