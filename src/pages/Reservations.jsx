@@ -6,6 +6,7 @@ const emptyForm = { date: "", time: "", partySize: 2, reservationType: "dining",
 export default function Reservations() {
   const [reservations, setReservations] = useState([]);
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -14,7 +15,34 @@ export default function Reservations() {
     api.get("/reservations").then(({ data }) => setReservations(data));
   }
 
-  useEffect(loadReservations, []);
+  // Load once, then refresh every 20 seconds so status changes show up without reloading.
+  useEffect(() => {
+    loadReservations();
+    const timer = setInterval(() => {
+      if (!document.hidden) loadReservations();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, []);
+
+  function startEdit(r) {
+    setEditingId(r._id);
+    setForm({
+      date: r.date,
+      time: r.time,
+      partySize: r.partySize,
+      reservationType: r.reservationType || "dining",
+      specialRequests: r.specialRequests || "",
+    });
+    setError("");
+    setSuccess("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError("");
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -22,20 +50,32 @@ export default function Reservations() {
     setSuccess("");
     setSubmitting(true);
     try {
-      const { data } = await api.post("/reservations", form, { skipGlobalError: true });
-      setSuccess(`Table ${data.tableNumber} booked for ${data.date} at ${data.time}.`);
+      if (editingId) {
+        const { data } = await api.put(`/reservations/${editingId}`, form, { skipGlobalError: true });
+        setSuccess(`Reservation updated: table ${data.tableNumber} on ${data.date} at ${data.time}.`);
+        setEditingId(null);
+      } else {
+        const { data } = await api.post("/reservations", form, { skipGlobalError: true });
+        setSuccess(`Table ${data.tableNumber} booked for ${data.date} at ${data.time}.`);
+      }
       setForm(emptyForm);
       loadReservations();
     } catch (err) {
-      setError(err.response?.data?.message || "Could not book that table.");
+      setError(err.response?.data?.message || "Could not save that reservation.");
     } finally {
       setSubmitting(false);
     }
   }
 
   async function handleCancel(id) {
-    await api.delete(`/reservations/${id}`);
-    loadReservations();
+    if (!window.confirm("Cancel this reservation?")) return;
+    try {
+      await api.delete(`/reservations/${id}`);
+      if (editingId === id) cancelEdit();
+      loadReservations();
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not cancel the reservation.");
+    }
   }
 
   return (
@@ -43,7 +83,7 @@ export default function Reservations() {
       <h2>Reservations</h2>
       <div className="grid-2">
         <form className="form-card" onSubmit={handleSubmit}>
-          <h3>Book a table</h3>
+          <h3>{editingId ? "Edit reservation" : "Book a table"}</h3>
           {error && <div className="form-error">{error}</div>}
           {success && <div className="form-success">{success}</div>}
           <div className="form-row">
@@ -103,9 +143,16 @@ export default function Reservations() {
               onChange={(e) => setForm({ ...form, specialRequests: e.target.value })}
             />
           </div>
-          <button className="btn btn-primary" type="submit" disabled={submitting}>
-            {submitting ? "Booking…" : "Book table"}
-          </button>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button className="btn btn-primary" type="submit" disabled={submitting}>
+              {submitting ? "Saving…" : editingId ? "Update reservation" : "Book table"}
+            </button>
+            {editingId && (
+              <button className="btn-ghost" type="button" onClick={cancelEdit}>
+                Cancel edit
+              </button>
+            )}
+          </div>
         </form>
 
         <div>
@@ -120,12 +167,18 @@ export default function Reservations() {
                 <span className={`status-badge status-${r.status}`}>{r.status}</span>
               </div>
               <p className="muted">
-                Table {r.tableNumber} · Party of {r.partySize} &middot;{" "}<span style={{ textTransform: "capitalize" }}>{r.reservationType || "dining"}</span>
+                Table {r.tableNumber} · Party of {r.partySize} ·{" "}
+                <span style={{ textTransform: "capitalize" }}>{r.reservationType || "dining"}</span>
               </p>
               {r.status !== "cancelled" && (
-                <button className="btn-ghost" onClick={() => handleCancel(r._id)}>
-                  Cancel
-                </button>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <button className="btn-ghost" onClick={() => startEdit(r)}>
+                    Edit
+                  </button>
+                  <button className="btn-ghost" onClick={() => handleCancel(r._id)}>
+                    Cancel
+                  </button>
+                </div>
               )}
             </div>
           ))}
