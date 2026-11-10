@@ -1,10 +1,12 @@
 import { useState } from "react";
 import AdminMenu from "./AdminMenu.jsx";
+import AdminOverview from "./AdminOverview.jsx";
 import AdminOrders from "./AdminOrders.jsx";
 import AdminReservations from "./AdminReservations.jsx";
 import AdminUsers from "./AdminUsers.jsx";
 
 const TABS = [
+  { key: "overview", label: "Overview" },
   { key: "menu", label: "Menu" },
   { key: "orders", label: "Orders" },
   { key: "reservations", label: "Reservations & Events" },
@@ -12,7 +14,7 @@ const TABS = [
 ];
 
 export default function AdminDashboard() {
-  const [tab, setTab] = useState("menu");
+  const [tab, setTab] = useState("overview");
 
   return (
     <div className="container page">
@@ -24,6 +26,7 @@ export default function AdminDashboard() {
           </button>
         ))}
       </div>
+      {tab === "overview" && <AdminOverview />}
       {tab === "menu" && <AdminMenu />}
       {tab === "orders" && <AdminOrders />}
       {tab === "reservations" && <AdminReservations />}
