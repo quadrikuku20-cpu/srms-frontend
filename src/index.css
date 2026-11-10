@@ -361,3 +361,44 @@ table.data-table th { color: var(--ink-soft); font-weight: 500; font-size: 0.78r
   font-size: 0.72rem; color: var(--gold); border: 1px solid var(--gold);
   padding: 2px 8px; border-radius: 999px; margin-left: 8px;
 }
+
+/* ---------- Mobile responsiveness ---------- */
+@media (max-width: 720px) {
+  .container { padding: 0 16px; }
+  .page { padding: 24px 0 70px; }
+
+  /* Nav wraps instead of overflowing, and does not eat the screen while scrolling */
+  .navbar { position: static; }
+  .navbar .container { flex-wrap: wrap; gap: 8px 12px; padding-top: 12px; padding-bottom: 12px; }
+  .brand { font-size: 1.15rem; }
+  .nav-links { flex-wrap: wrap; gap: 8px 16px; }
+
+  .hero { padding: 36px 0; }
+  .hero-actions { flex-wrap: wrap; }
+
+  /* Forms: one column, 16px inputs so iOS does not zoom in */
+  .form-row { flex-direction: column; gap: 0; }
+  .form-field input, .form-field select, .form-field textarea { font-size: 16px; }
+
+  /* Menu page */
+  .menu-toolbar { gap: 8px; }
+  .menu-toolbar input[type="search"],
+  .menu-toolbar input[type="number"],
+  .menu-toolbar select { flex: 1 1 100%; font-size: 16px; }
+  .category-tabs { width: 100%; overflow-x: auto; white-space: nowrap; }
+  .category-tabs button { flex-shrink: 0; }
+  .menu-grid { grid-template-columns: 1fr; }
+
+  /* Cart / checkout */
+  .cart-panel { padding: 16px; }
+  .cart-line { flex-wrap: wrap; }
+
+  /* Admin: tabs and tables scroll sideways inside their own area */
+  .admin-tabs { overflow-x: auto; white-space: nowrap; }
+  .admin-tabs button { flex-shrink: 0; margin-right: 16px; }
+  table.data-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+
+  /* Chatbot fits the phone width */
+  .chat-toggle { right: 16px; bottom: 16px; }
+  .chat-window { left: 16px; right: 16px; width: auto; bottom: 84px; max-height: 70vh; }
+}
