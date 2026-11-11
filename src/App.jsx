@@ -13,6 +13,7 @@ import OrderHistory from "./pages/OrderHistory.jsx";
 import Reservations from "./pages/Reservations.jsx";
 import Events from "./pages/Events.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import Profile from "./pages/Profile.jsx";
 
 export default function App() {
   return (
@@ -24,6 +25,14 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/login" element={<Login />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/register" element={<Register />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route

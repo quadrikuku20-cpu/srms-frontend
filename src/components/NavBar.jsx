@@ -23,6 +23,7 @@ export default function NavBar() {
           {user && <NavLink to="/reservations">Reservations</NavLink>}
           {user && <NavLink to="/events">Events</NavLink>}
           {user && <NavLink to="/orders">My Orders</NavLink>}
+          {user && <NavLink to="/profile">Profile</NavLink>}
           {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
           <NavLink to="/checkout">
             Cart{totalCount > 0 && <span className="cart-pill">{totalCount}</span>}

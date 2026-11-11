@@ -35,13 +35,17 @@ export function AuthProvider({ children }) {
     return data.user;
   }
 
+  function updateUser(patch) {
+    setUser((prev) => ({ ...prev, ...patch }));
+  }
+
   function logout() {
     localStorage.removeItem("srms_token");
     setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
