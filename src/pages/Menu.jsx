@@ -13,6 +13,7 @@ const CATEGORIES = [
 export default function Menu() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [category, setCategory] = useState("");
   const [dietary, setDietary] = useState("");
   const [search, setSearch] = useState("");
@@ -28,8 +29,14 @@ export default function Menu() {
 
     api
       .get("/menu", { params })
-      .then(({ data }) => setItems(data))
-      .catch(() => setItems([]))
+      .then(({ data }) => {
+        setItems(data);
+        setLoadFailed(false);
+      })
+      .catch(() => {
+        setItems([]);
+        setLoadFailed(true);
+      })
       .finally(() => setLoading(false));
   }, [category, dietary, search, maxPrice]);
 
@@ -59,11 +66,11 @@ export default function Menu() {
         </div>
         <input
           type="search"
-          placeholder="Search dishes..."
+          aria-label="Search dishes" placeholder="Search dishes..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select value={dietary} onChange={(e) => setDietary(e.target.value)}>
+        <select aria-label="Dietary filter" value={dietary} onChange={(e) => setDietary(e.target.value)}>
           <option value="">Any diet</option>
           <option value="vegetarian">Vegetarian</option>
           <option value="vegan">Vegan</option>
@@ -75,14 +82,17 @@ export default function Menu() {
           type="number"
           min="0"
           step="1"
-          placeholder="Max price ($)"
+          aria-label="Maximum price" placeholder="Max price ($)"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
         />
       </div>
 
       {loading && <p>Loading menu...</p>}
-      {!loading && items.length === 0 && (
+      {!loading && loadFailed && (
+        <div className="empty-state">Could not load the menu. Please try again in a moment.</div>
+      )}
+      {!loading && !loadFailed && items.length === 0 && (
         <div className="empty-state">No dishes match those filters.</div>
       )}
 

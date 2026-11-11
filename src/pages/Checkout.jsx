@@ -96,8 +96,8 @@ export default function Checkout() {
             <h3>Delivery details</h3>
             {error && <div className="form-error">{error}</div>}
             <div className="form-field">
-              <label>Fulfillment</label>
-              <select value={fulfillmentType} onChange={(e) => setFulfillmentType(e.target.value)}>
+              <label htmlFor="fulfillment">Fulfillment</label>
+              <select id="fulfillment" value={fulfillmentType} onChange={(e) => setFulfillmentType(e.target.value)}>
                 <option value="pickup">Pickup</option>
                 <option value="delivery">Delivery</option>
               </select>

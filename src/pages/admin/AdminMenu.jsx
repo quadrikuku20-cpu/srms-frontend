@@ -111,13 +111,13 @@ export default function AdminMenu() {
         <h3>{editingId ? "Edit item" : "Add menu item"}</h3>
         {error && <div className="form-error">{error}</div>}
         <div className="form-field">
-          <label>Name</label>
-          <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <label htmlFor="mname">Name</label>
+          <input id="mname" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </div>
         <div className="form-row">
           <div className="form-field">
-            <label>Category</label>
-            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+            <label htmlFor="mcat">Category</label>
+            <select id="mcat" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
               <option value="starter">Starter</option>
               <option value="main">Main</option>
               <option value="dessert">Dessert</option>
@@ -125,10 +125,10 @@ export default function AdminMenu() {
             </select>
           </div>
           <div className="form-field">
-            <label>Price</label>
+            <label htmlFor="mprice">Price</label>
             <input
               type="number"
-              step="0.01"
+              id="mprice" step="0.01"
               min="0"
               required
               value={form.price}
@@ -137,24 +137,24 @@ export default function AdminMenu() {
           </div>
         </div>
         <div className="form-field">
-          <label>Description</label>
-          <textarea
+          <label htmlFor="mdesc">Description</label>
+          <textarea id="mdesc"
             rows={2}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
         <div className="form-field">
-          <label>Ingredients (comma-separated)</label>
+          <label htmlFor="ming">Ingredients (comma-separated)</label>
           <input
-            value={form.ingredients}
+            id="ming" value={form.ingredients}
             onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
           />
         </div>
         <div className="form-field">
-          <label>Dietary info (comma-separated: vegetarian, vegan, gluten-free…)</label>
+          <label htmlFor="mdiet">Dietary info (comma-separated: vegetarian, vegan, gluten-free…)</label>
           <input
-            value={form.dietaryInfo}
+            id="mdiet" value={form.dietaryInfo}
             onChange={(e) => setForm({ ...form, dietaryInfo: e.target.value })}
           />
         </div>
