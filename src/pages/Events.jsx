@@ -57,7 +57,13 @@ export default function Events() {
   }
 
   async function handleCancel(id) {
-    await api.delete(`/events/${id}`);
+    if (!window.confirm("Cancel this event request?")) return;
+    try {
+      await api.delete(`/events/${id}`);
+    } catch (err) {
+      setError(err.response?.data?.message || "Could not cancel the event request.");
+      return;
+    }
     loadEvents();
   }
 
