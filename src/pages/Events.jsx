@@ -15,7 +15,13 @@ export default function Events() {
     api.get("/events").then(({ data }) => setEvents(data));
   }
 
-  useEffect(loadEvents, []);
+  useEffect(() => {
+    loadEvents();
+    const timer = setInterval(() => {
+      if (!document.hidden) loadEvents();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     api
