@@ -59,12 +59,21 @@ You can also create a new customer account on the Register page.
 | Menu (category tabs, search, dietary filter, add to cart) | `/menu` | Anyone |
 | Log in / Register | `/login`, `/register` | Anyone |
 | Cart and checkout (pickup or delivery, simulated payment) | `/checkout` | Anyone to build a cart, login required to place the order |
-| My Orders (history and status) | `/orders` | Logged-in users |
-| Reservations (book, view, cancel) | `/reservations` | Logged-in users |
-| Special events (birthday, corporate and more) | `/events` | Logged-in users |
-| Admin dashboard: menu add, edit and delete; order status; reservation and event approval | `/admin` | Admin only |
+| My Orders (history, live status, cancel pending orders) | `/orders` | Logged-in users |
+| Profile (name, favorite category, dietary needs) | `/profile` | Logged-in users |
+| Reservations (book with a type, view, edit, cancel) | `/reservations` | Logged-in users |
+| Special events (birthday, corporate and more, with optional menu selection) | `/events` | Logged-in users |
+| Admin dashboard: Overview analytics; menu add, edit and delete; order status; reservation and event approval; user management | `/admin` | Admin only |
 
 The **AI assistant** is the round button at the bottom right of every page. It sends the question to the backend, which matches it against a keyword dataset and replies. It answers questions about specials, dietary options, recommendations, opening hours and reservations, and it can recall a logged-in customer's last order.
+
+## Other behaviour
+
+- **Live updates:** orders, reservations and events refresh every 20 seconds (the admin Overview every 30 seconds), so status changes show up without reloading. Refreshing pauses while the browser tab is hidden.
+- **Error handling:** one Axios response interceptor shows an error banner for network and server problems, and logs the user out and sends them to the login page when a session expires. Forms show their own inline errors.
+- **Cart persistence:** the cart is saved in `localStorage` and survives a page refresh. Prices are always recalculated by the server at checkout.
+- **Mobile layout:** responsive CSS for phones, including a wrapping navbar, stacked forms, and admin tables that scroll sideways.
+- **Accessibility:** form labels are linked to their inputs, and the menu filters have accessible names.
 
 ## React concepts used
 
@@ -75,18 +84,21 @@ The **AI assistant** is the round button at the bottom right of every page. It s
 - **Forms:** controlled inputs with submit handling and error and loading states.
 - **Routing:** React Router routes, plus a `ProtectedRoute` component that redirects visitors who are not logged in (or not admins).
 - **Context:** `AuthContext` keeps the logged-in user and token; `CartContext` keeps the cart.
-- **API layer:** a single Axios instance (`src/api/api.js`) that adds the login token to every request.
+- **API layer:** a single Axios instance (`src/api/api.js`) that adds the login token to every request and handles errors in one place (see above).
+- **Effect cleanup:** `useEffect` with `setInterval` for live refresh, and a cleanup function that stops the timer when the page closes.
+- **Browser storage:** `localStorage` keeps the login token and the cart between visits.
 
 ## Project structure
 
 ```
 src/
-  api/api.js               Axios instance with the token interceptor
+  api/api.js               Axios instance with token and error interceptors
   context/                 AuthContext.jsx, CartContext.jsx
-  components/              NavBar, MenuItemCard, Chatbot, ProtectedRoute
+  components/              NavBar, MenuItemCard, Chatbot, ProtectedRoute, ErrorBanner
   pages/                   Home, Menu, Login, Register, Checkout, OrderHistory,
-                           Reservations, Events
-  pages/admin/             AdminDashboard, AdminMenu, AdminOrders, AdminReservations
+                           Reservations, Events, Profile
+  pages/admin/             AdminDashboard, AdminOverview, AdminMenu, AdminOrders,
+                           AdminReservations, AdminUsers
   App.jsx                  routes
   main.jsx                 app entry (router and providers)
   index.css                design variables and all styles
