@@ -6,6 +6,7 @@ export default function AdminUsers() {
   const { user: me } = useAuth();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   function loadUsers() {
     api
@@ -14,7 +15,8 @@ export default function AdminUsers() {
         setUsers(data);
         setError("");
       })
-      .catch((err) => setError(err.response?.data?.message || "Could not load users."));
+      .catch((err) => setError(err.response?.data?.message || "Could not load users."))
+      .finally(() => setLoading(false));
   }
 
   useEffect(loadUsers, []);
@@ -32,6 +34,7 @@ export default function AdminUsers() {
   return (
     <div>
       <h3>Users</h3>
+      {loading && <p className="muted">Loading users…</p>}
       {error && <div className="form-error">{error}</div>}
       <table className="data-table">
         <thead>

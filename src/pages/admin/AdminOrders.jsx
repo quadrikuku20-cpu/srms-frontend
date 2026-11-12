@@ -5,9 +5,13 @@ const STATUSES = ["pending", "preparing", "ready", "delivered", "cancelled"];
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   function loadOrders() {
-    api.get("/orders").then(({ data }) => setOrders(data));
+    api
+      .get("/orders")
+      .then(({ data }) => setOrders(data))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -26,6 +30,8 @@ export default function AdminOrders() {
   return (
     <div>
       <h3>Incoming orders</h3>
+      {loading && <p className="muted">Loading orders…</p>}
+      {!loading && orders.length === 0 && <div className="empty-state">No orders yet.</div>}
       <table className="data-table">
         <thead>
           <tr>

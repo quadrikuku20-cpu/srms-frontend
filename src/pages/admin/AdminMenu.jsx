@@ -13,12 +13,14 @@ const emptyForm = {
 
 export default function AdminMenu() {
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
 
   function loadItems() {
-    api.get("/menu", { params: { includeUnavailable: true } }).then(({ data }) => setItems(data));
+    api.get("/menu", { params: { includeUnavailable: true } }).then(({ data }) => setItems(data))
+      .finally(() => setLoading(false));
   }
 
   useEffect(loadItems, []);
@@ -76,6 +78,7 @@ export default function AdminMenu() {
     <div className="grid-2">
       <div>
         <h3>Menu items</h3>
+        {loading && <p className="muted">Loading menu…</p>}
         <table className="data-table">
           <thead>
             <tr>

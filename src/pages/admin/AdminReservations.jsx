@@ -3,11 +3,13 @@ import api from "../../api/api.js";
 
 export default function AdminReservations() {
   const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
 
   function loadAll() {
-    api.get("/reservations").then(({ data }) => setReservations(data));
-    api.get("/events").then(({ data }) => setEvents(data));
+    const reservationsReq = api.get("/reservations").then(({ data }) => setReservations(data));
+    const eventsReq = api.get("/events").then(({ data }) => setEvents(data));
+    Promise.allSettled([reservationsReq, eventsReq]).then(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -31,6 +33,8 @@ export default function AdminReservations() {
   return (
     <div>
       <h3>Reservations</h3>
+      {loading && <p className="muted">Loading…</p>}
+      {!loading && reservations.length === 0 && <div className="empty-state">No reservations yet.</div>}
       <table className="data-table">
         <thead>
           <tr>
@@ -68,6 +72,7 @@ export default function AdminReservations() {
       <hr className="section-divider" />
 
       <h3>Special events</h3>
+      {!loading && events.length === 0 && <div className="empty-state">No event requests yet.</div>}
       <table className="data-table">
         <thead>
           <tr>

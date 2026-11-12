@@ -5,6 +5,7 @@ const emptyForm = { eventType: "birthday", date: "", time: "", guestCount: 8, me
 
 export default function Events() {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [menuItems, setMenuItems] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
@@ -12,7 +13,10 @@ export default function Events() {
   const [submitting, setSubmitting] = useState(false);
 
   function loadEvents() {
-    api.get("/events").then(({ data }) => setEvents(data));
+    api
+      .get("/events")
+      .then(({ data }) => setEvents(data))
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -155,7 +159,8 @@ export default function Events() {
 
         <div>
           <h3>Your event requests</h3>
-          {events.length === 0 && <div className="empty-state">No event requests yet.</div>}
+          {loading && <p className="muted">Loading event requests…</p>}
+          {!loading && events.length === 0 && <div className="empty-state">No event requests yet.</div>}
           {events.map((ev) => (
             <div key={ev._id} className="cart-panel" style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>

@@ -5,6 +5,7 @@ const emptyForm = { date: "", time: "", partySize: 2, reservationType: "dining",
 
 export default function Reservations() {
   const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
@@ -12,7 +13,10 @@ export default function Reservations() {
   const [submitting, setSubmitting] = useState(false);
 
   function loadReservations() {
-    api.get("/reservations").then(({ data }) => setReservations(data));
+    api
+      .get("/reservations")
+      .then(({ data }) => setReservations(data))
+      .finally(() => setLoading(false));
   }
 
   // Load once, then refresh every 20 seconds so status changes show up without reloading.
@@ -157,7 +161,8 @@ export default function Reservations() {
 
         <div>
           <h3>Upcoming reservations</h3>
-          {reservations.length === 0 && <div className="empty-state">No reservations yet.</div>}
+          {loading && <p className="muted">Loading reservations…</p>}
+          {!loading && reservations.length === 0 && <div className="empty-state">No reservations yet.</div>}
           {reservations.map((r) => (
             <div key={r._id} className="cart-panel" style={{ marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
