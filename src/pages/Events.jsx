@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import api from "../api/api.js";
 
-const emptyForm = { eventType: "birthday", date: "", time: "", guestCount: 8, menuSelection: [], additionalRequirements: "" };
+const emptyForm = {
+  eventType: "birthday",
+  date: "",
+  time: "",
+  guestCount: 8,
+  menuSelection: [],
+  additionalRequirements: "",
+};
 
 export default function Events() {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -19,6 +27,7 @@ export default function Events() {
       .finally(() => setLoading(false));
   }
 
+  // Load once, then refresh every 20 seconds so status changes show up without reloading.
   useEffect(() => {
     loadEvents();
     const timer = setInterval(() => {
@@ -43,18 +52,47 @@ export default function Events() {
     }));
   }
 
+  function startEdit(ev) {
+    setEditingId(ev._id);
+    setForm({
+      eventType: ev.eventType,
+      date: ev.date,
+      time: ev.time,
+      guestCount: ev.guestCount,
+      menuSelection: (ev.menuSelection || []).map((m) => m._id || m),
+      additionalRequirements: ev.additionalRequirements || "",
+    });
+    setError("");
+    setSuccess("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError("");
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
     setSubmitting(true);
     try {
-      await api.post("/events", form, { skipGlobalError: true });
-      setSuccess("Event request submitted — an admin will confirm shortly.");
+      if (editingId) {
+        await api.put(`/events/${editingId}`, form, { skipGlobalError: true });
+        setSuccess("Event request updated.");
+        setEditingId(null);
+      } else {
+        await api.post("/events", form, { skipGlobalError: true });
+        setSuccess("Event request submitted — an admin will confirm shortly.");
+      }
       setForm(emptyForm);
       loadEvents();
     } catch (err) {
-      setError(err.response?.data?.message || "Could not submit that event request.");
+      setError(
+        err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || "Could not save that event request."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -64,11 +102,11 @@ export default function Events() {
     if (!window.confirm("Cancel this event request?")) return;
     try {
       await api.delete(`/events/${id}`);
+      if (editingId === id) cancelEdit();
+      loadEvents();
     } catch (err) {
       setError(err.response?.data?.message || "Could not cancel the event request.");
-      return;
     }
-    loadEvents();
   }
 
   return (
@@ -77,7 +115,7 @@ export default function Events() {
       <p>Birthday parties, corporate gatherings, and other celebrations.</p>
       <div className="grid-2">
         <form className="form-card" onSubmit={handleSubmit}>
-          <h3>Request an event</h3>
+          <h3>{editingId ? "Edit event request" : "Request an event"}</h3>
           {error && <div className="form-error">{error}</div>}
           {success && <div className="form-success">{success}</div>}
           <div className="form-field">
@@ -121,6 +159,7 @@ export default function Events() {
               id="guests"
               type="number"
               min={1}
+              max={100}
               required
               value={form.guestCount}
               onChange={(e) => setForm({ ...form, guestCount: Number(e.target.value) })}
@@ -152,9 +191,16 @@ export default function Events() {
               onChange={(e) => setForm({ ...form, additionalRequirements: e.target.value })}
             />
           </div>
-          <button className="btn btn-primary" type="submit" disabled={submitting}>
-            {submitting ? "Submitting…" : "Submit request"}
-          </button>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button className="btn btn-primary" type="submit" disabled={submitting}>
+              {submitting ? "Saving…" : editingId ? "Update request" : "Submit request"}
+            </button>
+            {editingId && (
+              <button className="btn-ghost" type="button" onClick={cancelEdit}>
+                Cancel edit
+              </button>
+            )}
+          </div>
         </form>
 
         <div>
@@ -177,9 +223,16 @@ export default function Events() {
                 )}
               </p>
               {ev.status !== "cancelled" && (
-                <button className="btn-ghost" onClick={() => handleCancel(ev._id)}>
-                  Cancel
-                </button>
+                <div style={{ display: "flex", gap: 16 }}>
+                  {ev.status === "pending" && (
+                    <button className="btn-ghost" onClick={() => startEdit(ev)}>
+                      Edit
+                    </button>
+                  )}
+                  <button className="btn-ghost" onClick={() => handleCancel(ev._id)}>
+                    Cancel
+                  </button>
+                </div>
               )}
             </div>
           ))}
